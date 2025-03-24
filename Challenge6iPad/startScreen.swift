@@ -21,15 +21,20 @@ struct startScreen: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-
             .edgesIgnoringSafeArea(.all)
-            
-    
-            Text("Hello, World!")
 
+            ZStack{
+                Image("Logo")
+            
+                VStack{
+                   
+                        
+                    }
+                }
+            }
         }
     }
-}
+
 
 #Preview {
     startScreen()
