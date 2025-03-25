@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct Challenge6iPadApp: App {
+struct ClothingDesignLibraryApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ClothingDesignListView()
         }
     }
 }
