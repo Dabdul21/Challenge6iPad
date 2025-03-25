@@ -110,3 +110,4 @@ struct ClothingDesignListView: View {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(imageName)
     }
 }
+

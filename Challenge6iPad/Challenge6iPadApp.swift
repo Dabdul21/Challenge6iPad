@@ -11,7 +11,7 @@ import SwiftUI
 struct ClothingDesignLibraryApp: App {
     var body: some Scene {
         WindowGroup {
-            ClothingDesignListView()
+            startScreen()
         }
     }
 }

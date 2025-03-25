@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B23E949B2D918F9F00BEEF52 /* Challenge6iPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Challenge6iPad.app; path = "/Users/solomiyapylypiv/Documents/Challenge6iPad/build/Debug-iphoneos/Challenge6iPad.app"; sourceTree = "<absolute>"; };
+		B220D58A2D92F6D50061F253 /* Challenge6iPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Challenge6iPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B23E94C92D918FBE00BEEF52 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,6 +39,7 @@
 			children = (
 				B23E94C92D918FBE00BEEF52 /* .gitignore */,
 				B23E949D2D918F9F00BEEF52 /* Challenge6iPad */,
+				B220D58A2D92F6D50061F253 /* Challenge6iPad.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,7 +65,7 @@
 			packageProductDependencies = (
 			);
 			productName = Challenge6iPad;
-			productReference = B23E949B2D918F9F00BEEF52 /* Challenge6iPad.app */;
+			productReference = B220D58A2D92F6D50061F253 /* Challenge6iPad.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

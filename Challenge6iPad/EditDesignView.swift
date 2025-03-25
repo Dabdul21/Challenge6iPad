@@ -90,7 +90,7 @@ struct EditDesignView: View {
                 try? data.write(to: fileURL)
                 
                 // Update design in view model
-                if var index = viewModel.designs.firstIndex(where: { $0.id == design.id }) {
+                if let index = viewModel.designs.firstIndex(where: { $0.id == design.id }) {
                     viewModel.designs[index].name = designName
                     viewModel.designs[index].category = selectedCategory
                     viewModel.designs[index].imageName = imageName

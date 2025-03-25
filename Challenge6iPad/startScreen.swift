@@ -10,6 +10,8 @@ import SwiftUI
 struct startScreen: View {
     var body: some View {
         NavigationStack{
+            NavigationLink(destination: ClothingDesignListView()) {
+
         ZStack {
             LinearGradient(
                 gradient: Gradient(colors: [
@@ -25,67 +27,27 @@ struct startScreen: View {
             )
             .edgesIgnoringSafeArea(.all)
 
-            
-            VStack(spacing: 10){
-                Image("Logo")
-                    .resizable()
-                    .frame(width: 250, height: 250) //img size
-                    .padding(.bottom, 20)
-                
-                Text("Casa Love")
-                    .font(.system(size: 48, weight: .medium))
-                    .padding(.bottom, 100)
-                    .foregroundColor(.white)
-
-                
-                NavigationLink(destination: Dashboard()) {
-                    HStack{
-                        Text("Browse Clothing")
-                            .font(.system(size: 48, weight: .bold))
-                        Spacer()
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 48))
-
-                    }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 150)
-                        .padding(.vertical, 45)
-                        .background(Color(red: 31/255, green: 46/255, blue: 58/255))
-                        .cornerRadius(25)
-
-                        . overlay(
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Color.white, lineWidth: 6) // white outline background
-                        )
+            ZStack{
+                Circle()
+                    .fill(.blue)
                     
-                        }
-                    .padding(.horizontal, 100) // keeps the btn from touching the edge of screen
-                    .padding(.bottom, 35)       //space in between btn's
-                
-                
-                NavigationLink(destination: addDesign()) {
-                    HStack{
-                        Text("Add New Design")
-                            .font(.system(size: 48, weight: .bold))
+                    .stroke(Color.white, lineWidth: 6)
+                    .frame(width: 400, height: 400)
+                    .padding()
 
-                        Spacer()
-                        Image(systemName: "plus")
-                            .font(.system(size: 48))
-
-                    }
+                // white outline
+                
+                VStack(spacing: 50) {
+                    Image("House of ")
+                        .resizable()
+                        .frame(width: 250, height: 250)
+                        .padding(.bottom, 235)
+                    
+                    Text("Casa of Love")
+                        .font(.system(size: 50, weight: .bold))
                         .foregroundColor(.white)
-                        .padding(.horizontal, 150)
-                        .padding(.vertical, 45)
-                        .background(Color(red: 39/255, green: 80/255, blue: 114/255))
-                        .cornerRadius(25)
-
-                        . overlay(
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Color.white, lineWidth: 6) // white outline
-                        )
-                    }
-                    .padding(.horizontal, 100) // keeps the btn from touching the screen
-
+                }
+            }
                     }
                 }
             }
