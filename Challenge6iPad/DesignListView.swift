@@ -69,6 +69,7 @@ struct ClothingDesignListView: View {
                 .padding()
             }
             
+   
             // Show an emoty state if there are no designs
             if viewModel.designs.isEmpty {
                 VStack {

@@ -11,7 +11,8 @@ import SwiftUI
 struct ClothingDesignLibraryApp: App {
     var body: some Scene {
         WindowGroup {
-            startScreen()
+            ContentView()
         }
     }
 }
+
