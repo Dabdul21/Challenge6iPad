@@ -1,3 +1,4 @@
+//DesignDetailView.swift
 import SwiftUI
 
 struct ClothingDesignDetailView: View {

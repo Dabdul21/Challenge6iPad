@@ -251,7 +251,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Challenge6iPad/Preview Content\"";
-				DEVELOPMENT_TEAM = 664LQW6MNA;
+				DEVELOPMENT_TEAM = B5N4Y94PAG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need to use your camera";
@@ -282,7 +282,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Challenge6iPad/Preview Content\"";
-				DEVELOPMENT_TEAM = 664LQW6MNA;
+				DEVELOPMENT_TEAM = B5N4Y94PAG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need to use your camera";
