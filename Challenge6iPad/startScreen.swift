@@ -28,20 +28,20 @@ struct startScreen: View {
             .edgesIgnoringSafeArea(.all)
 
             ZStack{
-                Circle()
-                    .fill(.blue)
-                    
-                    .stroke(Color.white, lineWidth: 6)
-                    .frame(width: 400, height: 400)
-                    .padding()
+//                Circle()
+//                    .fill(.blue)
+//                    
+//                    .stroke(Color.white, lineWidth: 6)
+//                    .frame(width: 400, height: 400)
+//                    .padding()
 
                 // white outline
                 
-                VStack(spacing: 50) {
-                    Image("House of ")
+                VStack(spacing: 20) {
+                    Image("Logo")
                         .resizable()
                         .frame(width: 250, height: 250)
-                        .padding(.bottom, 235)
+                        .padding(.bottom, 5)
                     
                     Text("Casa of Love")
                         .font(.system(size: 50, weight: .bold))

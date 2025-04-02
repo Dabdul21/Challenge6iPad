@@ -30,7 +30,8 @@ struct ARCameraViewRepresentable: UIViewControllerRepresentable {
 class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // MARK: - Properties
-    
+    var userHasMovedImage = false
+
     // Main AR view that displays camera feed and 3D content
     var arView: ARSCNView!
     
@@ -176,8 +177,37 @@ class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDele
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         tapGesture.numberOfTapsRequired = 2
         arView.addGestureRecognizer(tapGesture)
+        
+        //Add the pan gesture recognizer here:
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+        arView.addGestureRecognizer(panGesture)
     }
     
+    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
+        guard let modelNode = modelNode else { return }
+
+        let location = gesture.location(in: arView)
+        let results = arView.hitTest(location, types: [.existingPlaneUsingExtent, .featurePoint])
+
+        if let result = results.first {
+            let newTransform = result.worldTransform
+            let newPosition = SCNVector3(
+                newTransform.columns.3.x,
+                newTransform.columns.3.y,
+                newTransform.columns.3.z
+            )
+
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = 0.2
+            modelNode.position = newPosition
+            SCNTransaction.commit()
+
+            // ✅ Set this to stop snapping to chest
+            userHasMovedImage = true
+        }
+    }
+
+
     // Set up environmental mapping for realistic reflections
     private func setupEnvironmentMapping() {
         // Enable automatic lighting updates based on environment
@@ -196,15 +226,15 @@ class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDele
     
     // Add UI controls for adjusting the image/texture
     private func addInteractiveElements() {
-        // Filter button to open filter selector
-        let filterButton = UIButton(type: .system)
-        filterButton.setTitle("Filters", for: .normal)
-        filterButton.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-        filterButton.setTitleColor(.white, for: .normal)
-        filterButton.layer.cornerRadius = 8
-        filterButton.frame = CGRect(x: 20, y: view.bounds.height - 100, width: 80, height: 40)
-        filterButton.addTarget(self, action: #selector(showFilters), for: .touchUpInside)
-        view.addSubview(filterButton)
+        // reset button to open filter selector
+        let resetButton = UIButton(type: .system)
+        resetButton.setTitle("Reset", for: .normal)
+        resetButton.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        resetButton.setTitleColor(.white, for: .normal)
+        resetButton.layer.cornerRadius = 8
+        resetButton.frame = CGRect(x: 20, y: view.bounds.height - 100, width: 80, height: 40)
+        resetButton.addTarget(self, action: #selector(resetModelPosition), for: .touchUpInside)
+        view.addSubview(resetButton)
         
         // Opacity slider for adjusting transparency
         let opacitySlider = UISlider()
@@ -390,30 +420,27 @@ class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDele
     private func anchorModelToChest(with bodyAnchor: ARBodyAnchor) {
         // Find the spine joint index (representing the chest)
         if let spineIndex = bodyAnchor.skeleton.definition.jointNames.firstIndex(of: "spine") {
-            // Get the transform for the spine joint
             let spineTransform = bodyAnchor.skeleton.jointModelTransforms[spineIndex]
-            
-            // Convert to world coordinate space
             let worldTransform = bodyAnchor.transform * spineTransform
-            
-            // Apply the transform to the model with a slight forward offset
-            // so the image appears on the chest rather than inside it
-            var modelTransform = worldTransform
-            modelTransform.columns.3.z -= 0.1  // Move slightly forward
-            
-            // Smoothly update the model position
+
+            // Extract only position from the matrix
+            let position = SCNVector3(
+                worldTransform.columns.3.x,
+                worldTransform.columns.3.y,
+                worldTransform.columns.3.z - 0.1 // Move slightly forward so it's not inside the chest
+            )
+
+            // Apply position and manually set rotation to zero
             SCNTransaction.begin()
             SCNTransaction.animationDuration = 0.1
-            modelNode?.simdTransform = modelTransform
-            
-            // Ensure model faces outward from chest
-            modelNode?.eulerAngles.x = 0
-            modelNode?.eulerAngles.y = 0
-            
+
+            modelNode?.position = position
+            modelNode?.eulerAngles = SCNVector3(0, 0, 0) // Always face forward
+
             SCNTransaction.commit()
         }
     }
-    
+
     // Process the selected image before applying it as a texture
     private func processImageForTexturing(image: UIImage) -> UIImage {
         // Create a CIImage from the UIImage for processing
@@ -453,43 +480,55 @@ class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDele
     }
     
     // Apply a filter effect to the current image
-    private func applyFilter(_ filterName: String) {
-        guard let image = uploadedImage else { return }
-        
-        // Skip processing if "None" selected
-        if filterName == "None" {
-            applyImageToModel(image: image)
-            return
-        }
-        
-        // Create a CIContext for image processing
-        let context = CIContext()
-        guard let ciImage = CIImage(image: image) else { return }
-        
-        // Apply selected filter based on name
-        var filteredImage: CIImage?
-        switch filterName {
-        case "Sepia":
-            filteredImage = ciImage.applyingFilter("CISepiaTone", parameters: [kCIInputIntensityKey: 0.8])
-        case "Noir":
-            filteredImage = ciImage.applyingFilter("CIPhotoEffectNoir", parameters: [:])
-        case "Chrome":
-            filteredImage = ciImage.applyingFilter("CIPhotoEffectChrome", parameters: [:])
-        case "Fade":
-            filteredImage = ciImage.applyingFilter("CIPhotoEffectFade", parameters: [:])
-        default:
-            filteredImage = ciImage
-        }
-        
-        // Convert the filtered CIImage back to UIImage
-        if let filteredImage = filteredImage,
-           let cgImage = context.createCGImage(filteredImage, from: filteredImage.extent) {
-            let processedImage = UIImage(cgImage: cgImage)
-            applyImageToModel(image: processedImage)
-        }
-    }
+//    private func applyFilter(_ filterName: String) {
+//        guard let image = uploadedImage else { return }
+//        
+//        // Skip processing if "None" selected
+//        if filterName == "None" {
+//            applyImageToModel(image: image)
+//            return
+//        }
+//        
+//        // Create a CIContext for image processing
+//        let context = CIContext()
+//        guard let ciImage = CIImage(image: image) else { return }
+//        
+//        // Apply selected filter based on name
+//        var filteredImage: CIImage?
+//        switch filterName {
+//        case "Sepia":
+//            filteredImage = ciImage.applyingFilter("CISepiaTone", parameters: [kCIInputIntensityKey: 0.8])
+//        case "Noir":
+//            filteredImage = ciImage.applyingFilter("CIPhotoEffectNoir", parameters: [:])
+//        case "Chrome":
+//            filteredImage = ciImage.applyingFilter("CIPhotoEffectChrome", parameters: [:])
+//        case "Fade":
+//            filteredImage = ciImage.applyingFilter("CIPhotoEffectFade", parameters: [:])
+//        default:
+//            filteredImage = ciImage
+//        }
+//        
+//        // Convert the filtered CIImage back to UIImage
+//        if let filteredImage = filteredImage,
+//           let cgImage = context.createCGImage(filteredImage, from: filteredImage.extent) {
+//            let processedImage = UIImage(cgImage: cgImage)
+//            applyImageToModel(image: processedImage)
+//        }
+//    }
     
     // MARK: - Action Handlers
+    @objc private func resetModelPosition() {
+        // Allow AR to keep snapping the model again after this
+        userHasMovedImage = false
+
+        // Immediately re-anchor the model to the chest if available
+        if let frame = arView.session.currentFrame,
+           let bodyAnchor = frame.anchors.compactMap({ $0 as? ARBodyAnchor }).first {
+            anchorModelToChest(with: bodyAnchor)
+        }
+    }
+
+
     
     @objc private func backButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -540,22 +579,22 @@ class ARCameraViewController: UIViewController, ARSCNViewDelegate, ARSessionDele
         modelNode.eulerAngles.y = currentRotation + rotation
     }
     
-    @objc private func showFilters() {
-        // Create an action sheet with filter options
-        let alertController = UIAlertController(title: "Select Filter", message: nil, preferredStyle: .actionSheet)
-        
-        // Add different filter options
-        let filters = ["None", "Sepia", "Noir", "Chrome", "Fade"]
-        for filter in filters {
-            alertController.addAction(UIAlertAction(title: filter, style: .default) { [weak self] _ in
-                self?.applyFilter(filter)
-            })
-        }
-        
-        // Add cancel option
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(alertController, animated: true)
-    }
+//    @objc private func showFilters() {
+//        // Create an action sheet with filter options
+//        let alertController = UIAlertController(title: "Select Filter", message: nil, preferredStyle: .actionSheet)
+//        
+//        // Add different filter options
+//        let filters = ["None", "Sepia", "Noir", "Chrome", "Fade"]
+//        for filter in filters {
+//            alertController.addAction(UIAlertAction(title: filter, style: .default) { [weak self] _ in
+//                self?.applyFilter(filter)
+//            })
+//        }
+//        
+//        // Add cancel option
+//        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//        present(alertController, animated: true)
+//    }
     
     @objc private func opacityChanged(_ slider: UISlider) {
         // Update texture opacity/transparency
